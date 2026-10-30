@@ -2613,6 +2613,19 @@ fn testPatchAddContext(
     try testing.expectEqualStrings(expect, patch_out);
 }
 
+/// `s` repeated `n` times, null terminated. 0.17 removed the array
+/// multiplication operator.
+fn repeat(comptime s: []const u8, comptime n: usize) *const [s.len * n:0]u8 {
+    return comptime blk: {
+        @setEvalBranchQuota(s.len * n + 1000);
+        var out: [s.len * n:0]u8 = undefined;
+        for (0..n) |i| @memcpy(out[i * s.len ..][0..s.len], s);
+        out[s.len * n] = 0;
+        const final = out;
+        break :blk &final;
+    };
+}
+
 test "testPatchAddContext" {
     const allocator = testing.allocator;
     const config: PatchConfig = blk: {
@@ -2742,7 +2755,7 @@ fn testMakePatch(allocator: Allocator) !void {
         }
     }
     {
-        const text1a = "abcdef" ** 100;
+        const text1a = repeat("abcdef", 100);
         const text2a = text1a ++ "123";
         const expected_patch = switch (match_max_bits) {
             32 => "@@ -573,28 +573,31 @@\n cdefabcdefabcdefabcdefabcdef\n+123\n",
@@ -3350,7 +3363,7 @@ const OOM = Allocator.Error;
 const ArrayListUnmanaged = std.ArrayListUnmanaged;
 const ArrayList = std.array_list.Managed;
 const builtin = @import("builtin");
-const is_debug = builtin.mode == .Debug;
+const is_debug = builtin.mode == .debug;
 
 const dmp = @import("../dmp.zig");
 const diff_mod = @import("diff.zig");

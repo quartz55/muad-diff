@@ -427,4 +427,4 @@ const ArrayListUnmanaged = std.ArrayListUnmanaged;
 const assert = std.debug.assert;
 
 const builtin = @import("builtin");
-const is_debug = builtin.mode == .Debug;
+const is_debug = builtin.mode == .debug;

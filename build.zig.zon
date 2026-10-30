@@ -4,7 +4,7 @@
 
     .version = "0.0.1",
 
-    .minimum_zig_version = "0.16.0",
+    .minimum_zig_version = "0.17.0",
 
     .fingerprint = 0xcf462719a1974fa7,
 
@@ -14,7 +14,8 @@
             .hash = "clap-0.11.0-oBajB-HnAQDPCKYzwF7rO3qDFwRcD39Q0DALlTSz5H7e",
         },
         .ztap = .{
-            .path = "../ztap",
+            .url = "git+https://github.com/mnemnion/ztap#dbf939852e91da863b2e7730a0b617dc75cedb18",
+            .hash = "ztap-0.9.6-2runTQNaAABqFPVgwWjfXtahb8QkjE3lnMzpfnw2EzGk",
         },
         // .obelizmo = .{
         //     .path = "../obelizmo",
