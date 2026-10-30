@@ -882,14 +882,27 @@ test "ZDelta encode rejects invalid text" {
     try testing.expectError(error.InvalidZDeltaText, encode(allocator, diff_b, .b));
 }
 
+/// `s` repeated `n` times, null terminated. 0.17 removed the array
+/// multiplication operator, so the tests build their long inputs with this.
+fn repeat(comptime s: []const u8, comptime n: usize) *const [s.len * n:0]u8 {
+    return comptime blk: {
+        @setEvalBranchQuota(s.len * n + 1000);
+        var out: [s.len * n:0]u8 = undefined;
+        for (0..n) |i| @memcpy(out[i * s.len ..][0..s.len], s);
+        out[s.len * n] = 0;
+        const final = out;
+        break :blk &final;
+    };
+}
+
 fn testZDeltaEncodeLargeInsert(allocator: Allocator) !void {
     const text = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const edits = [_]TestEdit{TestEdit.asBorrow(.insert, text ** 8)};
+    const edits = [_]TestEdit{TestEdit.asBorrow(.insert, repeat(text, 8))};
     const diff = .{ .items = edits[0..] };
 
     const actual = try encode(allocator, diff, .b);
     defer allocator.free(actual);
-    try testing.expectEqualStrings("zΔ⚡b|+" ++ text ** 8 ++ "|", actual);
+    try testing.expectEqualStrings("zΔ⚡b|+" ++ repeat(text, 8) ++ "|", actual);
 }
 
 test "ZDelta encode maps writer allocation failures to OutOfMemory" {

@@ -110,9 +110,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const run_delta_maker = b.addRunArtifact(delta_maker);
-    if (b.args) |args| {
-        run_delta_maker.addArgs(args);
-    }
+    run_delta_maker.addPassthruArgs();
 
     const delta_maker_step = b.step(
         "delta-maker",
@@ -136,9 +134,7 @@ pub fn build(b: *std.Build) void {
         "/Users/atman/Dropbox/deck/m/skills/.venv/bin/python",
     });
     refresh_corpus.addFileArg(b.path("tools/refresh_corpus.py"));
-    if (b.args) |args| {
-        refresh_corpus.addArgs(args);
-    }
+    refresh_corpus.addPassthruArgs();
 
     const refresh_corpus_step = b.step(
         "refresh-corpus",
